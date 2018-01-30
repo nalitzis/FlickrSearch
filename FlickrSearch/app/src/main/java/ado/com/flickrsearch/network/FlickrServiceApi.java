@@ -1,0 +1,90 @@
+package ado.com.flickrsearch.network;
+
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.UUID;
+
+public class FlickrServiceApi implements ServiceApi {
+
+    private static final String TAG = "FlickrServiceApi";
+
+    private static final String AMP = "&";
+
+    private static final String API_KEY = "api_key=";
+    private static final String API_KEY_VALUE = "7a3bf663e19d20c7bdc2bc355e5ae10e";
+
+    private static final String FLICKR_API_ENDPOINT = "https://api.flickr.com/services/rest/?";
+    private static final String METHOD = "method=";
+    private static final String SEARCH_API = "method=flickr.photos.search";
+
+    private static final String TEXT = "text=";
+    private static final String FORMAT = "format=json&nojsoncallback=1";
+
+    //https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=7a3bf663e19d20c7bdc2bc355e5ae10e&text=kittens&format=json&nojsoncallback=1
+
+    private final RequestManager mRequestManager;
+
+    public FlickrServiceApi(final RequestManager requestManager) {
+        mRequestManager = requestManager;
+    }
+
+    @Override
+    public UUID search(final String query, final ApiListener listener) {
+        URL url = buildSearchTextQuery(API_KEY_VALUE, SEARCH_API, query);
+        if (url != null) {
+            Request request = new NetworkRequest(url, Request.ExpectedResultType.TEXT);
+            mRequestManager.add(request);
+            return request.getId();
+        } else {
+            if (listener != null) {
+                listener.onError();
+            }
+            return null;
+        }
+    }
+
+    @Override
+    public UUID fetchContent(long contentId, ApiListener listener) {
+        URL url = buildImageQuery();
+        //TODO avoid code duplication with method above
+        if (url != null) {
+            Request request = new NetworkRequest(url, Request.ExpectedResultType.BLOB);
+            mRequestManager.add(request);
+            return request.getId();
+        } else {
+            if (listener != null) {
+                listener.onError();
+            }
+            return null;
+        }
+    }
+
+    @Override
+    public void cancel(UUID requestId) {
+        mRequestManager.cancel(requestId);
+    }
+
+    @Nullable
+    private URL buildSearchTextQuery(String apiKeyValue, String method, String searchText) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(FLICKR_API_ENDPOINT).append(METHOD).append(method)
+                .append(AMP).append(API_KEY).append(apiKeyValue)
+                .append(AMP).append(TEXT).append(searchText)
+                .append(AMP).append(FORMAT);
+        try {
+            return new URL(sb.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "malformed url: " + e.getMessage());
+        }
+        return null;
+    }
+
+    @Nullable
+    private URL buildImageQuery() {
+        //TODO build Url for getting image
+        return null;
+    }
+}
