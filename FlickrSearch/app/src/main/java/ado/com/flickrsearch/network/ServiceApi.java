@@ -1,17 +1,27 @@
 package ado.com.flickrsearch.network;
 
-import java.util.UUID;
+import java.net.URL;
+
+import ado.com.flickrsearch.domain.ContentResult;
+import ado.com.flickrsearch.domain.TextResult;
 
 public interface ServiceApi {
 
-    UUID search(String query, ApiListener listener);
+    URL search(String query, SearchListener listener);
 
-    UUID fetchContent(long contentId, ApiListener listener);
+    URL fetchContent(long contentId, ContentListener listener);
 
-    void cancel(UUID requestId);
+    void cancel(URL requestUrl);
 
-    interface ApiListener {
-        void onCompleted(Response response);
+    interface SearchListener {
+        void onCompleted(TextResult searchResult);
+
+        void onError();
+
+    }
+
+    interface ContentListener {
+        void onCompleted(ContentResult imageResult);
 
         void onError();
 

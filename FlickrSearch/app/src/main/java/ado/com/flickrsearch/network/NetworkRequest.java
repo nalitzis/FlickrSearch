@@ -15,11 +15,6 @@ public class NetworkRequest implements Request {
     }
 
     @Override
-    public UUID getId() {
-        return mId;
-    }
-
-    @Override
     public URL getUrl() {
         return mUrl;
     }

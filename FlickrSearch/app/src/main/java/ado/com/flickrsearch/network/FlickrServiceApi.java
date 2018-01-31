@@ -18,12 +18,10 @@ public class FlickrServiceApi implements ServiceApi {
 
     private static final String FLICKR_API_ENDPOINT = "https://api.flickr.com/services/rest/?";
     private static final String METHOD = "method=";
-    private static final String SEARCH_API = "method=flickr.photos.search";
+    private static final String SEARCH_API = "flickr.photos.search";
 
     private static final String TEXT = "text=";
     private static final String FORMAT = "format=json&nojsoncallback=1";
-
-    //https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=7a3bf663e19d20c7bdc2bc355e5ae10e&text=kittens&format=json&nojsoncallback=1
 
     private final RequestManager mRequestManager;
 
@@ -32,12 +30,12 @@ public class FlickrServiceApi implements ServiceApi {
     }
 
     @Override
-    public UUID search(final String query, final ApiListener listener) {
+    public URL search(final String query, final SearchListener listener) {
         URL url = buildSearchTextQuery(API_KEY_VALUE, SEARCH_API, query);
         if (url != null) {
             Request request = new NetworkRequest(url, Request.ExpectedResultType.TEXT);
             mRequestManager.add(request);
-            return request.getId();
+            return request.getUrl();
         } else {
             if (listener != null) {
                 listener.onError();
@@ -47,13 +45,13 @@ public class FlickrServiceApi implements ServiceApi {
     }
 
     @Override
-    public UUID fetchContent(long contentId, ApiListener listener) {
+    public URL fetchContent(long contentId, ContentListener listener) {
         URL url = buildImageQuery();
         //TODO avoid code duplication with method above
         if (url != null) {
             Request request = new NetworkRequest(url, Request.ExpectedResultType.BLOB);
             mRequestManager.add(request);
-            return request.getId();
+            return request.getUrl();
         } else {
             if (listener != null) {
                 listener.onError();
@@ -63,8 +61,8 @@ public class FlickrServiceApi implements ServiceApi {
     }
 
     @Override
-    public void cancel(UUID requestId) {
-        mRequestManager.cancel(requestId);
+    public void cancel(URL requestUrl) {
+        mRequestManager.cancel(requestUrl);
     }
 
     @Nullable
