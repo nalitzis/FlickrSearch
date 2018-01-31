@@ -43,7 +43,7 @@ public class FlickrServiceApi implements ServiceApi {
             return request.getUrl();
         } else {
             if (listener != null) {
-                listener.onError();
+                listener.onError(new Exception("url is null"));
             }
             return null;
         }
@@ -59,7 +59,7 @@ public class FlickrServiceApi implements ServiceApi {
             return request.getUrl();
         } else {
             if (listener != null) {
-                listener.onError();
+                listener.onError(new Exception("url is null"));
             }
             return null;
         }

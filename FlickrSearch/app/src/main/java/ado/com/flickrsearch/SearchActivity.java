@@ -29,15 +29,15 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         public void onCompleted(SearchResult result) {
-            Log.d(TAG, "got search result");
+            Log.d(TAG, "got search result, images size: " + result.getImages().size());
             SearchFlickrApp application = (SearchFlickrApp) getApplication();
             ServiceApi serviceApi = application.getServiceApi();
             serviceApi.fetchImage(result, null);
         }
 
         @Override
-        public void onError() {
-
+        public void onError(Exception e) {
+            Log.e(TAG, e.getMessage());
         }
     }
 }

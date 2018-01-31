@@ -11,6 +11,6 @@ public interface RequestManager {
     interface RequestListener {
         void onCompleted(URL requestUrl, Response response);
 
-        void onError(URL requestUrl);
+        void onError(URL requestUrl, Exception e);
     }
 }

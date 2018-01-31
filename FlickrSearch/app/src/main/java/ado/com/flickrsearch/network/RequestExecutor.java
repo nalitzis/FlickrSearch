@@ -26,22 +26,18 @@ public class RequestExecutor implements Callable<Response> {
     public Response call() throws Exception {
         try {
             Log.d(TAG, "request url: " + mRequest.getUrl());
-
-            //TODO maybe revert to Runnable
             Response response = downloadUrl();
-
             if(response != null) {
                 //final String result = readStream(response.getContents());
                 Log.d(TAG, "size:" + response.getContents().length);
                 mListener.onCompleted(mRequest.getUrl(), response);
             }  else {
-                mListener.onError(mRequest.getUrl());
+                mListener.onError(mRequest.getUrl(), new Exception("response was empty"));
             }
-
-
             return response;
         } catch (IOException ioe) {
             Log.d(TAG, "IO exception: " + ioe.getMessage());
+            mListener.onError(mRequest.getUrl(), ioe);
         }
         return null;
     }
@@ -66,9 +62,9 @@ public class RequestExecutor implements Callable<Response> {
             if (stream != null) {
                 final byte[] contents = readStream(stream);
                 if(mRequest.getType() == Request.ExpectedResultType.TEXT) {
-                    response = new NetworkResponse(contents, Response.Type.TEXT);
+                    response = new NetworkResponse(mRequest.getUrl(), contents, Response.Type.TEXT);
                 } else if(mRequest.getType() == Request.ExpectedResultType.IMAGE) {
-                    response = new NetworkResponse(contents, Response.Type.IMAGE);
+                    response = new NetworkResponse(mRequest.getUrl(), contents, Response.Type.IMAGE);
                 }
             }
         } finally {
@@ -90,7 +86,6 @@ public class RequestExecutor implements Callable<Response> {
             result.write(buffer, 0, length);
         }
         return result.toByteArray();
-        //return result.toString("UTF-8");
     }
 
 }

@@ -1,6 +1,6 @@
 package ado.com.flickrsearch.network;
 
-import java.io.InputStream;
+import java.net.URL;
 
 public interface Response {
 
@@ -12,4 +12,7 @@ public interface Response {
     byte[] getContents();
 
     Type getType();
+
+    URL getUrl();
+
 }
