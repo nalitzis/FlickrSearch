@@ -2,26 +2,33 @@ package ado.com.flickrsearch.network;
 
 import java.net.URL;
 
-import ado.com.flickrsearch.domain.ContentResult;
-import ado.com.flickrsearch.domain.TextResult;
+import ado.com.flickrsearch.domain.ImageResult;
+import ado.com.flickrsearch.domain.SearchResult;
 
 public interface ServiceApi {
 
-    URL search(String query, SearchListener listener);
+    URL search(String query, Listener listener);
 
-    URL fetchContent(long contentId, ContentListener listener);
+    URL fetchImage(SearchResult searchResult, Listener listener);
 
     void cancel(URL requestUrl);
 
     interface SearchListener {
-        void onCompleted(TextResult searchResult);
+        void onCompleted(SearchResult searchResult);
 
         void onError();
 
     }
 
-    interface ContentListener {
-        void onCompleted(ContentResult imageResult);
+    interface Listener<T> {
+        void onCompleted(T result);
+
+        void onError();
+
+    }
+
+    interface ImageListener {
+        void onCompleted(ImageResult imageResult);
 
         void onError();
 

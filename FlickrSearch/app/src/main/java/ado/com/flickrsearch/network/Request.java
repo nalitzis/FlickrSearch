@@ -10,6 +10,6 @@ public interface Request {
 
     enum ExpectedResultType {
         TEXT,
-        BLOB
+        IMAGE
     }
 }

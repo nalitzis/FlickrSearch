@@ -5,7 +5,8 @@ import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.UUID;
+
+import ado.com.flickrsearch.domain.SearchResult;
 
 public class FlickrServiceApi implements ServiceApi {
 
@@ -18,10 +19,14 @@ public class FlickrServiceApi implements ServiceApi {
 
     private static final String FLICKR_API_ENDPOINT = "https://api.flickr.com/services/rest/?";
     private static final String METHOD = "method=";
-    private static final String SEARCH_API = "flickr.photos.search";
 
+    //search api
+    private static final String SEARCH_API = "flickr.photos.search";
     private static final String TEXT = "text=";
     private static final String FORMAT = "format=json&nojsoncallback=1";
+
+    //picture api
+    //https://farm1.staticflickr.com/2/1418878_1e92283336_m.jpg
 
     private final RequestManager mRequestManager;
 
@@ -30,11 +35,11 @@ public class FlickrServiceApi implements ServiceApi {
     }
 
     @Override
-    public URL search(final String query, final SearchListener listener) {
+    public URL search(final String query, final Listener listener) {
         URL url = buildSearchTextQuery(API_KEY_VALUE, SEARCH_API, query);
         if (url != null) {
             Request request = new NetworkRequest(url, Request.ExpectedResultType.TEXT);
-            mRequestManager.add(request);
+            mRequestManager.add(request, listener);
             return request.getUrl();
         } else {
             if (listener != null) {
@@ -45,12 +50,12 @@ public class FlickrServiceApi implements ServiceApi {
     }
 
     @Override
-    public URL fetchContent(long contentId, ContentListener listener) {
-        URL url = buildImageQuery();
+    public URL fetchImage(SearchResult textResult, Listener listener) {
+        URL url = buildImageQuery(textResult);
         //TODO avoid code duplication with method above
         if (url != null) {
-            Request request = new NetworkRequest(url, Request.ExpectedResultType.BLOB);
-            mRequestManager.add(request);
+            Request request = new NetworkRequest(url, Request.ExpectedResultType.IMAGE);
+            mRequestManager.add(request, listener);
             return request.getUrl();
         } else {
             if (listener != null) {
@@ -59,6 +64,7 @@ public class FlickrServiceApi implements ServiceApi {
             return null;
         }
     }
+
 
     @Override
     public void cancel(URL requestUrl) {
@@ -81,8 +87,13 @@ public class FlickrServiceApi implements ServiceApi {
     }
 
     @Nullable
-    private URL buildImageQuery() {
+    private URL buildImageQuery(SearchResult result) {
         //TODO build Url for getting image
+        try {
+            return new URL("https://farm1.staticflickr.com/2/1418878_1e92283336_m.jpg");
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "malformed url: " + e.getMessage());
+        }
         return null;
     }
 }

@@ -2,6 +2,7 @@ package ado.com.flickrsearch;
 
 import android.app.Application;
 
+import ado.com.flickrsearch.network.FlickrParser;
 import ado.com.flickrsearch.network.FlickrServiceApi;
 import ado.com.flickrsearch.network.NetworkRequestManager;
 import ado.com.flickrsearch.network.RequestManager;
@@ -15,7 +16,7 @@ public class SearchFlickrApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        final RequestManager requestManager = new NetworkRequestManager();
+        final RequestManager requestManager = new NetworkRequestManager(new FlickrParser());
         mServiceApi = new FlickrServiceApi(requestManager);
     }
 

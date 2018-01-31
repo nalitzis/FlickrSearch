@@ -13,10 +13,10 @@ public class RequestExecutor implements Callable<Response> {
 
     private static final String TAG = "RequestExecutor";
 
-    private final RequestManager.Listener mListener;
+    private final RequestManager.RequestListener mListener;
     private final Request mRequest;
 
-    RequestExecutor(final Request request, final RequestManager.Listener listener) {
+    RequestExecutor(final Request request, final RequestManager.RequestListener listener) {
         mRequest = request;
         mListener = listener;
     }
@@ -67,7 +67,7 @@ public class RequestExecutor implements Callable<Response> {
                 final byte[] contents = readStream(stream);
                 if(mRequest.getType() == Request.ExpectedResultType.TEXT) {
                     response = new NetworkResponse(contents, Response.Type.TEXT);
-                } else if(mRequest.getType() == Request.ExpectedResultType.BLOB) {
+                } else if(mRequest.getType() == Request.ExpectedResultType.IMAGE) {
                     response = new NetworkResponse(contents, Response.Type.IMAGE);
                 }
             }
