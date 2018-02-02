@@ -23,7 +23,7 @@ public class FlickrSearchResult implements SearchResult {
     }
 
     @Override
-    public List<FlickrImageUrl> getImages() {
+    public List<FlickrImageUrl> getImagesUrl() {
         return mImages;
     }
 }

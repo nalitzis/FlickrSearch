@@ -13,10 +13,13 @@ public class RequestExecutor implements Callable<Response> {
 
     private static final String TAG = "RequestExecutor";
 
-    private final RequestManager.RequestListener mListener;
+    private final RequestListener mListener;
     private final Request mRequest;
 
-    RequestExecutor(final Request request, final RequestManager.RequestListener listener) {
+    private static final int CONN_TIMEOUT_MSEC = 3000;
+    private static final String HTTP_METHOD = "GET";
+
+    RequestExecutor(final Request request, final RequestListener listener) {
         mRequest = request;
         mListener = listener;
     }
@@ -25,11 +28,8 @@ public class RequestExecutor implements Callable<Response> {
     @Override
     public Response call() throws Exception {
         try {
-            Log.d(TAG, "request url: " + mRequest.getUrl());
             Response response = downloadUrl();
             if(response != null) {
-                //final String result = readStream(response.getContents());
-                Log.d(TAG, "size:" + response.getContents().length);
                 mListener.onCompleted(mRequest.getUrl(), response);
             }  else {
                 mListener.onError(mRequest.getUrl(), new Exception("response was empty"));
@@ -49,9 +49,9 @@ public class RequestExecutor implements Callable<Response> {
         Response response = null;
         try {
             connection = (HttpsURLConnection) mRequest.getUrl().openConnection();
-            connection.setReadTimeout(3000);
-            connection.setConnectTimeout(3000);
-            connection.setRequestMethod("GET");
+            connection.setReadTimeout(CONN_TIMEOUT_MSEC);
+            connection.setConnectTimeout(CONN_TIMEOUT_MSEC);
+            connection.setRequestMethod(HTTP_METHOD);
             connection.setDoInput(true);
             connection.connect();
             int responseCode = connection.getResponseCode();

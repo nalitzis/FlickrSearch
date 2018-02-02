@@ -4,4 +4,6 @@ public interface SearchPresenter {
 
     void onSearchCommand(String search);
 
+    void onDestroy();
+
 }

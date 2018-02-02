@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface SearchResult extends Result {
 
-    List<? extends ImageUrl> getImages();
+    List<? extends ImageUrl> getImagesUrl();
 }

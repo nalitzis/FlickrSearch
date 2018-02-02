@@ -1,5 +1,7 @@
 package ado.com.flickrsearch.domain;
 
+import android.support.annotation.Nullable;
+
 import java.net.URL;
 
 import ado.com.flickrsearch.api.ImageUrl;
@@ -16,8 +18,11 @@ public class FlickrImageUrl implements ImageUrl {
         mSecret = secret;
         mServer = server;
         mFarm = farm;
-        //TODO convert params to url
         mImageUrl = null;
+    }
+
+    public void setImageUrl(URL url) {
+        mImageUrl = url;
     }
 
     public String getId() {
@@ -37,7 +42,7 @@ public class FlickrImageUrl implements ImageUrl {
     }
 
     @Override
-    public URL getUrl() {
+    @Nullable public URL getUrl() {
         return mImageUrl;
     }
 }

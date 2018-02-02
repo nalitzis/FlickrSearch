@@ -10,28 +10,35 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.support.v7.widget.SearchView;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
 import ado.com.flickrsearch.R;
-import ado.com.flickrsearch.SearchFlickrApp;
-import ado.com.flickrsearch.presenter.SearchFlickrPresenter;
+import ado.com.flickrsearch.FlickrSearchApp;
+import ado.com.flickrsearch.api.ImageResult;
+import ado.com.flickrsearch.presenter.FlickrSearchPresenter;
 import ado.com.flickrsearch.presenter.SearchPresenter;
 
 public class SearchActivity extends AppCompatActivity implements ImageViewer {
     private static final String TAG = "SearchActivity";
 
     private SearchPresenter mSearchPresenter;
+    private ImageAdapter mImageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupUi();
-        final SearchFlickrApp flickrApp = (SearchFlickrApp) getApplication();
-        mSearchPresenter = new SearchFlickrPresenter(flickrApp);
+        final FlickrSearchApp flickrApp = (FlickrSearchApp) getApplication();
+        mSearchPresenter = new FlickrSearchPresenter(flickrApp, this);
         handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mSearchPresenter.onDestroy();
+        mSearchPresenter = null;
     }
 
     private void setupUi() {
@@ -40,7 +47,8 @@ public class SearchActivity extends AppCompatActivity implements ImageViewer {
         setSupportActionBar(toolbar);
 
         GridView gridview = findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this));
+        mImageAdapter = new ImageAdapter(this);
+        gridview.setAdapter(mImageAdapter);
 
         gridview.setOnItemClickListener((parent, v, position, id) -> {
                 Toast.makeText(SearchActivity.this, "" + position,
@@ -60,6 +68,7 @@ public class SearchActivity extends AppCompatActivity implements ImageViewer {
         return true;
     }
 
+    @Override
     public void onNewIntent(Intent intent) {
         handleIntent(intent);
     }
@@ -67,8 +76,18 @@ public class SearchActivity extends AppCompatActivity implements ImageViewer {
     private void handleIntent(final Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Log.d(TAG, "query is: " +query);
+            Log.d(TAG, "query is: " + query);
+            mSearchPresenter.onSearchCommand(query);
         }
+    }
 
+    @Override
+    public void resetAdapter() {
+        mImageAdapter.clear();
+    }
+
+    @Override
+    public void onNewImage(ImageResult result) {
+        mImageAdapter.add(result);
     }
 }

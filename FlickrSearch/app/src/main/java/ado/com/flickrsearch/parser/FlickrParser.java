@@ -53,7 +53,6 @@ public class FlickrParser implements Parser {
         while (reader.hasNext()) {
             String name = reader.nextName();
             if (name.equals(PHOTOS)) {
-                Log.d(TAG, "read photos");
                 searchResult = readPhotosObject(reader, searchResult);
             } else if(name.equals(STAT)) {
                 reader.nextString();
@@ -70,7 +69,6 @@ public class FlickrParser implements Parser {
             String name = reader.nextName();
             if(name.equals(PAGE)) {
                 long l = reader.nextLong();
-                Log.d(TAG, "read PAGE " + l);
             } else if(name.equals(PAGES) || name.equals(TOTAL)) {
                 reader.nextString();
             } else if(name.equals(PERPAGE)) {
@@ -79,7 +77,6 @@ public class FlickrParser implements Parser {
                 flickrImageUrls = readPhotoArray(reader);
             }
         }
-        Log.d(TAG, "end photos");
         reader.endObject();
         searchResult.setImages(flickrImageUrls);
         return searchResult;
@@ -89,12 +86,8 @@ public class FlickrParser implements Parser {
     private List<FlickrImageUrl> readPhotoArray(final JsonReader reader) throws IOException {
         List<FlickrImageUrl> flickrImageUrls = new ArrayList<>();
         reader.beginArray();
-        int i = 0;
         while (reader.hasNext()) {
-            Log.d(TAG, "reading photo element " + i);
             flickrImageUrls.add(readPhotoElement(reader));
-            Log.d(TAG, "read photo element" + i);
-            i++;
         }
         reader.endArray();
         return flickrImageUrls;
@@ -110,16 +103,12 @@ public class FlickrParser implements Parser {
             String name = reader.nextName();
             if(name.equals(ID)) {
                 id = reader.nextString();
-                Log.d(TAG, "read ID " + id);
             } else if(name.equals(SECRET)) {
                 secret = reader.nextString();
-                Log.d(TAG, "read SECRET " + secret);
             } else if(name.equals(SERVER)) {
                 server = reader.nextString();
-                Log.d(TAG, "read SERVER " + server);
             } else if(name.equals(FARM)) {
                 farm = reader.nextInt();
-                Log.d(TAG, "read LONG " + farm);
             } else if(name.equals(OWNER) || name.equals(TITLE)) {
                 reader.nextString();
             } else if(name.equals(ISFAMILY) || name.equals(ISFRIEND) || name.equals(ISPUBLIC)) {
