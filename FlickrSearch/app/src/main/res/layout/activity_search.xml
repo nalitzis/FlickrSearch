@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="ado.com.flickrsearch.view.SearchActivity">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -26,11 +23,12 @@
         android:id="@+id/gridview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/appBarLayout"
         android:layout_marginTop="0dp"
         android:gravity="center"
         android:numColumns="3"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
-        />
+        android:stretchMode="columnWidth"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout"/>
 
     <ProgressBar
         android:id="@+id/progressBar1"
@@ -40,5 +38,4 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="68dp"
         android:layout_centerInParent="true"/>
-
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

@@ -13,7 +13,6 @@ import android.support.v7.widget.SearchView;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import ado.com.flickrsearch.R;
 import ado.com.flickrsearch.FlickrSearchApp;
@@ -46,7 +45,7 @@ public class SearchActivity extends AppCompatActivity implements ImageViewer {
     }
 
     private void setupUi() {
-        setContentView(R.layout.activity_search2);
+        setContentView(R.layout.activity_search);
         mSpinner = findViewById(R.id.progressBar1);
         showSpinner(false);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -55,11 +54,6 @@ public class SearchActivity extends AppCompatActivity implements ImageViewer {
         GridView gridview = findViewById(R.id.gridview);
         mImageAdapter = new ImageAdapter(this);
         gridview.setAdapter(mImageAdapter);
-
-        gridview.setOnItemClickListener((parent, v, position, id) -> {
-                Toast.makeText(SearchActivity.this, "" + position,
-                        Toast.LENGTH_SHORT).show();
-        });
     }
 
     @Override

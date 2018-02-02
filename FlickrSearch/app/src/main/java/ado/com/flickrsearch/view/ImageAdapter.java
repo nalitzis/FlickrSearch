@@ -22,6 +22,8 @@ public class ImageAdapter extends BaseAdapter {
     private final Context mContext;
     private final List<ImageResult> mImages = new ArrayList<>();
 
+    private static final int IMG_PADDING = 8;
+
     ImageAdapter(Context c) {
         mContext = c;
     }
@@ -50,25 +52,20 @@ public class ImageAdapter extends BaseAdapter {
         return 0;
     }
 
-    // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
-        //Log.d(TAG, "pos: " +position);
         ImageView imageView;
         if (convertView == null) {
-            // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(8, 8, 8, 8);
+            imageView.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            imageView.setScaleType(ImageView.ScaleType.CENTER);
+            imageView.setPadding(IMG_PADDING, IMG_PADDING, IMG_PADDING, IMG_PADDING);
         } else {
             imageView = (ImageView) convertView;
         }
-
         final ImageResult result = mImages.get(position);
         final Bitmap bmp = result.getBitmap();
         imageView.setImageBitmap(bmp);
-
-        //imageView.setImageResource(R.drawable.test);
+        imageView.setAdjustViewBounds(true);
         return imageView;
     }
 

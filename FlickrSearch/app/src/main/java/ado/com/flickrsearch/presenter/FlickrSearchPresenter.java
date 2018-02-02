@@ -44,7 +44,6 @@ public class FlickrSearchPresenter implements SearchPresenter {
         public void onCompleted(SearchResult result) {
             Log.d(TAG, "got search result, images size: " + result.getImagesUrl().size());
             mView.showSpinner(false);
-            //mView.onNewImage(null);
 
             final ServiceApi serviceApi = mApplication.getServiceApi();
             for (ImageUrl imgUrl : result.getImagesUrl()) {
