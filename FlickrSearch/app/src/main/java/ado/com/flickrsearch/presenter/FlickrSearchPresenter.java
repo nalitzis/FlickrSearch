@@ -1,5 +1,6 @@
 package ado.com.flickrsearch.presenter;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import ado.com.flickrsearch.FlickrSearchApp;
@@ -18,7 +19,7 @@ public class FlickrSearchPresenter implements SearchPresenter {
     private final SearchListener mSearchListener = new SearchListener();
     private final ImagesListener mImagesListener = new ImagesListener();
 
-    public FlickrSearchPresenter(final FlickrSearchApp application, ImageViewer view) {
+    public FlickrSearchPresenter(@NonNull final FlickrSearchApp application, @NonNull ImageViewer view) {
         mApplication = application;
         mView = view;
     }
@@ -28,6 +29,7 @@ public class FlickrSearchPresenter implements SearchPresenter {
         mView.resetAdapter();
         ServiceApi serviceApi = mApplication.getServiceApi();
         serviceApi.search(search, mSearchListener);
+        mView.showSpinner(true);
     }
 
     @Override
@@ -41,7 +43,7 @@ public class FlickrSearchPresenter implements SearchPresenter {
         @Override
         public void onCompleted(SearchResult result) {
             Log.d(TAG, "got search result, images size: " + result.getImagesUrl().size());
-
+            mView.showSpinner(false);
             //mView.onNewImage(null);
 
             final ServiceApi serviceApi = mApplication.getServiceApi();
@@ -64,9 +66,7 @@ public class FlickrSearchPresenter implements SearchPresenter {
 
         @Override
         public void onCompleted(ImageResult result) {
-            if(mView != null) {
-                mView.onNewImage(result);
-            }
+            mView.onNewImage(result);
         }
 
         @Override

@@ -6,5 +6,7 @@ public interface ImageViewer {
 
     void resetAdapter();
 
+    void showSpinner(boolean show);
+
     void onNewImage(ImageResult result);
 }

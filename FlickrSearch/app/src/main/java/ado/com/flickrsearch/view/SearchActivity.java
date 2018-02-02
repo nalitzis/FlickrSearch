@@ -10,7 +10,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.support.v7.widget.SearchView;
+import android.view.View;
 import android.widget.GridView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import ado.com.flickrsearch.R;
@@ -24,6 +26,8 @@ public class SearchActivity extends AppCompatActivity implements ImageViewer {
 
     private SearchPresenter mSearchPresenter;
     private ImageAdapter mImageAdapter;
+
+    private ProgressBar mSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +46,9 @@ public class SearchActivity extends AppCompatActivity implements ImageViewer {
     }
 
     private void setupUi() {
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_search2);
+        mSpinner = findViewById(R.id.progressBar1);
+        showSpinner(false);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -54,6 +60,15 @@ public class SearchActivity extends AppCompatActivity implements ImageViewer {
                 Toast.makeText(SearchActivity.this, "" + position,
                         Toast.LENGTH_SHORT).show();
         });
+    }
+
+    @Override
+    public void showSpinner(final boolean show) {
+        if(show) {
+            mSpinner.setVisibility(View.VISIBLE);
+        } else {
+            mSpinner.setVisibility(View.GONE);
+        }
     }
 
     @Override

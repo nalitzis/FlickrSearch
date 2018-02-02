@@ -3,6 +3,7 @@ package ado.com.flickrsearch.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -16,6 +17,8 @@ import ado.com.flickrsearch.R;
 import ado.com.flickrsearch.api.ImageResult;
 
 public class ImageAdapter extends BaseAdapter {
+    private static final String TAG = "ImageAdapter";
+
     private final Context mContext;
     private final List<ImageResult> mImages = new ArrayList<>();
 
@@ -49,6 +52,7 @@ public class ImageAdapter extends BaseAdapter {
 
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
+        //Log.d(TAG, "pos: " +position);
         ImageView imageView;
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
@@ -60,10 +64,8 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        //TODO decode before!!!!
         final ImageResult result = mImages.get(position);
-        final byte[] data = result.getData();
-        final Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+        final Bitmap bmp = result.getBitmap();
         imageView.setImageBitmap(bmp);
 
         //imageView.setImageResource(R.drawable.test);

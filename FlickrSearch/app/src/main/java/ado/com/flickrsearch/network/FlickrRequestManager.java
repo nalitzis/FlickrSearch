@@ -55,9 +55,11 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
 
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
 
+    private static final int NUM_OF_THREADS = 4;
+
     public FlickrRequestManager(final FlickrParser parser) {
         mParser = parser;
-        mService = Executors.newSingleThreadExecutor();
+        mService = Executors.newFixedThreadPool(NUM_OF_THREADS);
         mCurrentTasksMap = Collections.synchronizedMap(new HashMap<URL, Future<Response>>());
         mListenersMap = Collections.synchronizedMap(new HashMap<URL, ServiceApi.Listener>());
     }
