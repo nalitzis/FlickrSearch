@@ -1,6 +1,5 @@
-package ado.com.flickrsearch.network;
+package ado.com.flickrsearch.parser;
 
-import android.support.annotation.Nullable;
 import android.util.JsonReader;
 import android.util.Log;
 
@@ -11,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ado.com.flickrsearch.domain.FlickrSearchResult;
-import ado.com.flickrsearch.domain.ImageText;
-import ado.com.flickrsearch.domain.SearchResult;
+import ado.com.flickrsearch.domain.FlickrImageUrl;
+import ado.com.flickrsearch.api.SearchResult;
 
 public class FlickrParser implements Parser {
     private static final String TAG = "FlickrParser";
@@ -65,7 +64,7 @@ public class FlickrParser implements Parser {
     }
 
     private FlickrSearchResult readPhotosObject(JsonReader reader, FlickrSearchResult searchResult) throws IOException {
-        List<ImageText> imageTexts = new ArrayList<>(0);
+        List<FlickrImageUrl> flickrImageUrls = new ArrayList<>(0);
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
@@ -77,31 +76,31 @@ public class FlickrParser implements Parser {
             } else if(name.equals(PERPAGE)) {
                 reader.nextLong();
             } else if(name.equals(PHOTO)) {
-                imageTexts = readPhotoArray(reader);
+                flickrImageUrls = readPhotoArray(reader);
             }
         }
         Log.d(TAG, "end photos");
         reader.endObject();
-        searchResult.setImages(imageTexts);
+        searchResult.setImages(flickrImageUrls);
         return searchResult;
     }
 
 
-    private List<ImageText> readPhotoArray(final JsonReader reader) throws IOException {
-        List<ImageText> imageTexts = new ArrayList<>();
+    private List<FlickrImageUrl> readPhotoArray(final JsonReader reader) throws IOException {
+        List<FlickrImageUrl> flickrImageUrls = new ArrayList<>();
         reader.beginArray();
         int i = 0;
         while (reader.hasNext()) {
             Log.d(TAG, "reading photo element " + i);
-            imageTexts.add(readPhotoElement(reader));
+            flickrImageUrls.add(readPhotoElement(reader));
             Log.d(TAG, "read photo element" + i);
             i++;
         }
         reader.endArray();
-        return imageTexts;
+        return flickrImageUrls;
     }
 
-    private ImageText readPhotoElement(final JsonReader reader) throws IOException {
+    private FlickrImageUrl readPhotoElement(final JsonReader reader) throws IOException {
         String server = "";
         String secret = "";
         String id = "";
@@ -128,6 +127,6 @@ public class FlickrParser implements Parser {
             }
         }
         reader.endObject();
-        return new ImageText(id, secret, server, farm);
+        return new FlickrImageUrl(id, secret, server, farm);
     }
 }

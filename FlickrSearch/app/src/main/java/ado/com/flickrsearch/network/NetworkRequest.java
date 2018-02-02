@@ -6,7 +6,7 @@ public class NetworkRequest implements Request {
     private final URL mUrl;
     private final ExpectedResultType mType;
 
-    NetworkRequest(URL url, ExpectedResultType type) {
+    public NetworkRequest(URL url, ExpectedResultType type) {
         mUrl = url;
         mType = type;
     }

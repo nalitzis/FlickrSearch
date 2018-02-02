@@ -1,4 +1,4 @@
-package ado.com.flickrsearch.domain;
+package ado.com.flickrsearch.api;
 
 import java.net.URL;
 

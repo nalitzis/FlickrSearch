@@ -2,16 +2,16 @@ package ado.com.flickrsearch;
 
 import android.app.Application;
 
-import ado.com.flickrsearch.network.FlickrParser;
-import ado.com.flickrsearch.network.FlickrServiceApi;
+import ado.com.flickrsearch.parser.FlickrParser;
+import ado.com.flickrsearch.domain.FlickrServiceApi;
 import ado.com.flickrsearch.network.NetworkRequestManager;
 import ado.com.flickrsearch.network.RequestManager;
-import ado.com.flickrsearch.network.ServiceApi;
+import ado.com.flickrsearch.api.ServiceApi;
 
 
 public class SearchFlickrApp extends Application {
 
-    ServiceApi mServiceApi;
+    private ServiceApi mServiceApi;
 
     @Override
     public void onCreate() {

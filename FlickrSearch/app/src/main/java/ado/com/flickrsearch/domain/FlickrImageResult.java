@@ -2,6 +2,7 @@ package ado.com.flickrsearch.domain;
 
 import java.net.URL;
 
+import ado.com.flickrsearch.api.ImageResult;
 import ado.com.flickrsearch.network.Response;
 
 public class FlickrImageResult implements ImageResult {

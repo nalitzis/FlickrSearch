@@ -2,6 +2,8 @@ package ado.com.flickrsearch.network;
 
 import java.net.URL;
 
+import ado.com.flickrsearch.api.ServiceApi;
+
 public interface RequestManager {
 
     void add(Request request, ServiceApi.Listener listener);

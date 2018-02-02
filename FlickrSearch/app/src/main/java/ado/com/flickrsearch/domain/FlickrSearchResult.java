@@ -3,15 +3,17 @@ package ado.com.flickrsearch.domain;
 import java.net.URL;
 import java.util.List;
 
+import ado.com.flickrsearch.api.SearchResult;
+
 public class FlickrSearchResult implements SearchResult {
     private URL mUrl;
-    private List<ImageText> mImages;
+    private List<FlickrImageUrl> mImages;
 
     public FlickrSearchResult(URL url) {
         mUrl = url;
     }
 
-    public void setImages(List<ImageText> images) {
+    public void setImages(List<FlickrImageUrl> images) {
         mImages = images;
     }
 
@@ -21,7 +23,7 @@ public class FlickrSearchResult implements SearchResult {
     }
 
     @Override
-    public List<ImageText> getImages() {
+    public List<FlickrImageUrl> getImages() {
         return mImages;
     }
 }

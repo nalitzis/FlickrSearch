@@ -7,8 +7,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,9 +14,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import ado.com.flickrsearch.api.ServiceApi;
 import ado.com.flickrsearch.domain.FlickrImageResult;
-import ado.com.flickrsearch.domain.ImageResult;
-import ado.com.flickrsearch.domain.SearchResult;
+import ado.com.flickrsearch.api.ImageResult;
+import ado.com.flickrsearch.api.SearchResult;
+import ado.com.flickrsearch.parser.Parser;
 
 public class NetworkRequestManager implements RequestManager, RequestManager.RequestListener {
 

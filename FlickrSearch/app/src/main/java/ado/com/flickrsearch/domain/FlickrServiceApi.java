@@ -1,4 +1,4 @@
-package ado.com.flickrsearch.network;
+package ado.com.flickrsearch.domain;
 
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -6,7 +6,11 @@ import android.util.Log;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import ado.com.flickrsearch.domain.SearchResult;
+import ado.com.flickrsearch.api.ServiceApi;
+import ado.com.flickrsearch.api.SearchResult;
+import ado.com.flickrsearch.network.NetworkRequest;
+import ado.com.flickrsearch.network.Request;
+import ado.com.flickrsearch.network.RequestManager;
 
 public class FlickrServiceApi implements ServiceApi {
 
@@ -35,36 +39,27 @@ public class FlickrServiceApi implements ServiceApi {
     }
 
     @Override
-    public URL search(final String query, final Listener listener) {
-        URL url = buildSearchTextQuery(API_KEY_VALUE, SEARCH_API, query);
-        if (url != null) {
-            Request request = new NetworkRequest(url, Request.ExpectedResultType.TEXT);
-            mRequestManager.add(request, listener);
-            return request.getUrl();
-        } else {
-            if (listener != null) {
-                listener.onError(new Exception("url is null"));
-            }
-            return null;
-        }
+    public void search(final String query, final Listener listener) {
+        final URL url = buildSearchTextQuery(API_KEY_VALUE, SEARCH_API, query);
+        doFetch(url, listener, Request.ExpectedResultType.TEXT);
     }
 
     @Override
-    public URL fetchImage(SearchResult textResult, Listener listener) {
-        URL url = buildImageQuery(textResult);
-        //TODO avoid code duplication with method above
+    public void fetchImage(SearchResult textResult, Listener listener) {
+        final URL url = buildImageQuery(textResult);
+        doFetch(url, listener, Request.ExpectedResultType.IMAGE);
+    }
+
+    private void doFetch(final URL url, final Listener listener, Request.ExpectedResultType requestType) {
         if (url != null) {
-            Request request = new NetworkRequest(url, Request.ExpectedResultType.IMAGE);
+            Request request = new NetworkRequest(url, requestType);
             mRequestManager.add(request, listener);
-            return request.getUrl();
         } else {
             if (listener != null) {
                 listener.onError(new Exception("url is null"));
             }
-            return null;
         }
     }
-
 
     @Override
     public void cancel(URL requestUrl) {

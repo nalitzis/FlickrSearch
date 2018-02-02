@@ -1,9 +1,9 @@
-package ado.com.flickrsearch.network;
+package ado.com.flickrsearch.parser;
 
 import java.io.IOException;
 import java.net.URL;
 
-import ado.com.flickrsearch.domain.SearchResult;
+import ado.com.flickrsearch.api.SearchResult;
 
 public interface Parser {
 

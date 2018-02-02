@@ -1,16 +1,23 @@
 package ado.com.flickrsearch.domain;
 
-public class ImageText {
+import java.net.URL;
+
+import ado.com.flickrsearch.api.ImageUrl;
+
+public class FlickrImageUrl implements ImageUrl {
     private final String mId;
     private final String mSecret;
     private final String mServer;
     private final int mFarm;
+    private URL mImageUrl;
 
-    public ImageText(String id, String secret, String server, int farm) {
+    public FlickrImageUrl(String id, String secret, String server, int farm) {
         mId = id;
         mSecret = secret;
         mServer = server;
         mFarm = farm;
+        //TODO convert params to url
+        mImageUrl = null;
     }
 
     public String getId() {
@@ -27,5 +34,10 @@ public class ImageText {
 
     public int getFarm() {
         return mFarm;
+    }
+
+    @Override
+    public URL getUrl() {
+        return mImageUrl;
     }
 }
