@@ -60,7 +60,7 @@ public class RequestExecutor implements Callable<Response> {
             }
             stream = connection.getInputStream();
             if (stream != null) {
-                final byte[] contents = readStream(stream);
+                final byte[] contents = Utils.readStream(stream);
                 if(mRequest.getType() == Request.ExpectedResultType.TEXT) {
                     response = new NetworkResponse(mRequest.getUrl(), contents, Response.Type.TEXT);
                 } else if(mRequest.getType() == Request.ExpectedResultType.IMAGE) {
@@ -77,15 +77,4 @@ public class RequestExecutor implements Callable<Response> {
         }
         return response;
     }
-
-    private byte[] readStream(final InputStream stream) throws IOException {
-        final ByteArrayOutputStream result = new ByteArrayOutputStream();
-        final byte[] buffer = new byte[1024];
-        int length;
-        while ((length = stream.read(buffer)) != -1) {
-            result.write(buffer, 0, length);
-        }
-        return result.toByteArray();
-    }
-
 }

@@ -2,9 +2,11 @@ package ado.com.flickrsearch.api;
 
 import java.util.List;
 
+import ado.com.flickrsearch.domain.FlickrImageResult;
+
 public interface SearchResult extends Result {
 
-    List<? extends ImageResult> getImagesUrl();
+    List<FlickrImageResult> getImagesUrl();
 
     String getTotalSize();
 

@@ -2,6 +2,7 @@ package ado.com.flickrsearch.view;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -19,14 +20,20 @@ public class ImageAdapter extends BaseAdapter {
 
     private final SearchActivity mSearchActivity;
 
-    private final SparseArray<ImageResult> mImages = new SparseArray<>();
+    private final SparseArray<ImageResult> mImages;
 
     private int mTotalSize;
 
     private static final int IMG_PADDING = 8;
 
     ImageAdapter(SearchActivity searchActivity) {
+        this(searchActivity, new SparseArray<>());
+    }
+
+    @VisibleForTesting
+    ImageAdapter(SearchActivity searchActivity, SparseArray<ImageResult> images) {
         mSearchActivity = searchActivity;
+        mImages = images;
     }
 
     void setSize(int size) {

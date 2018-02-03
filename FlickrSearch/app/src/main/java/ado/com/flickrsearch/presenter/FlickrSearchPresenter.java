@@ -1,6 +1,7 @@
 package ado.com.flickrsearch.presenter;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import ado.com.flickrsearch.FlickrSearchApp;
@@ -19,12 +20,31 @@ public class FlickrSearchPresenter implements SearchPresenter {
 
     private String mCurrentSearchString;
 
-    private final SearchListener mSearchListener = new SearchListener();
-    private final ImagesListener mImagesListener = new ImagesListener();
+    private ServiceApi.Listener<SearchResult> mSearchListener = new SearchListener();
+    private ServiceApi.Listener<FlickrImageResult> mImagesListener = new ImagesListener();
 
     public FlickrSearchPresenter(@NonNull final FlickrSearchApp application, @NonNull ImageViewer view) {
         mApplication = application;
         mView = view;
+    }
+
+    @VisibleForTesting
+    FlickrSearchPresenter(@NonNull final FlickrSearchApp application, @NonNull final ImageViewer view,
+                                 @NonNull final ServiceApi.Listener searchListener, @NonNull final ServiceApi.Listener imageListener) {
+
+        this(application, view);
+        mSearchListener = searchListener;
+        mImagesListener = imageListener;
+    }
+
+    @VisibleForTesting
+    ServiceApi.Listener<SearchResult> getSearchListener() {
+        return mSearchListener;
+    }
+
+    @VisibleForTesting
+    ServiceApi.Listener<FlickrImageResult> getImageListener() {
+        return mImagesListener;
     }
 
     @Override
@@ -50,9 +70,7 @@ public class FlickrSearchPresenter implements SearchPresenter {
 
         @Override
         public void onCompleted(SearchResult result) {
-            Log.d(TAG, "got search result (page " + result.getPage() + "), images size: " + result.getImagesUrl().size());
             mView.showSpinner(false);
-
             mView.setTotalSize(Integer.parseInt(result.getTotalSize()));
             mView.configureImages(result.getImagesUrl());
         }

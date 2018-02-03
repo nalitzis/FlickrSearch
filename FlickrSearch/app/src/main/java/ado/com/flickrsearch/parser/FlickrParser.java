@@ -35,7 +35,7 @@ public class FlickrParser implements Parser {
 
 
     @Override
-    public SearchResult parse(String input, URL url) throws IOException {
+    public SearchResult parse(String input, URL url) throws IOException, IllegalStateException {
         final StringReader stringReader = new StringReader(input);
         JsonReader reader = new JsonReader(stringReader);
         FlickrSearchResult searchResult = new FlickrSearchResult(url);
@@ -47,7 +47,7 @@ public class FlickrParser implements Parser {
         return searchResult;
     }
 
-    private FlickrSearchResult getFlickrSearchResult(JsonReader reader, FlickrSearchResult searchResult) throws IOException {
+    private FlickrSearchResult getFlickrSearchResult(JsonReader reader, FlickrSearchResult searchResult) throws IOException, IllegalStateException {
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
@@ -61,7 +61,7 @@ public class FlickrParser implements Parser {
         return searchResult;
     }
 
-    private FlickrSearchResult readPhotosObject(JsonReader reader, FlickrSearchResult searchResult) throws IOException {
+    private FlickrSearchResult readPhotosObject(JsonReader reader, FlickrSearchResult searchResult) throws IOException, IllegalStateException {
         List<FlickrImageResult> flickrImageResults = new ArrayList<>(0);
         reader.beginObject();
         while (reader.hasNext()) {
@@ -84,7 +84,7 @@ public class FlickrParser implements Parser {
     }
 
 
-    private List<FlickrImageResult> readPhotoArray(final JsonReader reader) throws IOException {
+    private List<FlickrImageResult> readPhotoArray(final JsonReader reader) throws IOException, IllegalStateException {
         List<FlickrImageResult> flickrImages = new ArrayList<>();
         reader.beginArray();
         while (reader.hasNext()) {
@@ -94,7 +94,7 @@ public class FlickrParser implements Parser {
         return flickrImages;
     }
 
-    private FlickrImageResult readPhotoElement(final JsonReader reader) throws IOException {
+    private FlickrImageResult readPhotoElement(final JsonReader reader) throws IOException, IllegalStateException {
         String server = "";
         String secret = "";
         String id = "";

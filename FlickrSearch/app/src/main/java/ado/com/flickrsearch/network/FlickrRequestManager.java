@@ -3,6 +3,7 @@ package ado.com.flickrsearch.network;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import java.io.IOException;
@@ -59,11 +60,19 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
     private static final int NUM_OF_THREADS = 4;
 
     public FlickrRequestManager(final FlickrParser parser) {
+        this(parser, Collections.synchronizedMap(new HashMap<>()), Collections.synchronizedMap(new HashMap<>()),
+                Collections.synchronizedMap(new HashMap<>()), Executors.newFixedThreadPool(NUM_OF_THREADS));
+    }
+
+    @VisibleForTesting
+    FlickrRequestManager(final FlickrParser parser, final Map<URL, Future<Response>> tasks,
+                         final Map<URL, ServiceApi.Listener> listeners, final Map<URL, FlickrImageResult> pendingImageRequests,
+                         final ExecutorService service) {
         mParser = parser;
-        mService = Executors.newFixedThreadPool(NUM_OF_THREADS);
-        mCurrentTasksMap = Collections.synchronizedMap(new HashMap<URL, Future<Response>>());
-        mListenersMap = Collections.synchronizedMap(new HashMap<URL, ServiceApi.Listener>());
-        mPendingImageRequests = Collections.synchronizedMap(new HashMap<URL, FlickrImageResult>());
+        mCurrentTasksMap = tasks;
+        mListenersMap = listeners;
+        mPendingImageRequests = pendingImageRequests;
+        mService = service;
     }
 
     @Override
@@ -138,7 +147,7 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
                     if (listener != null) {
                         mMainHandler.post(() -> listener.onCompleted(searchResult));
                     }
-                } catch (final IOException e) {
+                } catch (final IOException | IllegalStateException e) {
                     onError(requestUrl, e);
                 } finally {
                     removeRequest(requestUrl);
