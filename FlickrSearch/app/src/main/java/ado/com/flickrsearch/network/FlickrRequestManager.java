@@ -49,9 +49,9 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
 
     private final ExecutorService mService;
 
-    private final Map<URL, Future<Response>> mCurrentTasksMap;
-    private final Map<URL, ServiceApi.Listener> mListenersMap;
-    private final Map<URL, FlickrImageResult> mPendingImageRequests;
+    private final Map<String, Future<Response>> mCurrentTasksMap;
+    private final Map<String, ServiceApi.Listener> mListenersMap;
+    private final Map<String, FlickrImageResult> mPendingImageRequests;
 
     private final FlickrParser mParser;
 
@@ -65,8 +65,8 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
     }
 
     @VisibleForTesting
-    FlickrRequestManager(final FlickrParser parser, final Map<URL, Future<Response>> tasks,
-                         final Map<URL, ServiceApi.Listener> listeners, final Map<URL, FlickrImageResult> pendingImageRequests,
+    FlickrRequestManager(final FlickrParser parser, final Map<String, Future<Response>> tasks,
+                         final Map<String, ServiceApi.Listener> listeners, final Map<String, FlickrImageResult> pendingImageRequests,
                          final ExecutorService service) {
         mParser = parser;
         mCurrentTasksMap = tasks;
@@ -101,31 +101,32 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
     @Override
     public void fetchImage(final ImageResult imageResult, final Listener listener) {
         mPendingImageRequests.put(imageResult.getUrl(), (FlickrImageResult)imageResult);
-        doFetch(imageResult.getUrl(), listener, Request.ExpectedResultType.IMAGE);
+        try {
+            final URL url = new URL(imageResult.getUrl());
+            doFetch(url, listener, Request.ExpectedResultType.IMAGE);
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "malformed url: " + e.getMessage());
+        }
+
     }
 
     private void doFetch(final URL url, final Listener listener, final Request.ExpectedResultType requestType) {
-        if (mListenersMap.containsKey(url))
+        if (mListenersMap.containsKey(url.toString())) {
             return;
-
-        if (url != null) {
-            final Request request = new NetworkRequest(url, requestType);
-            add(request, listener);
-        } else {
-            if (listener != null) {
-                listener.onError(new Exception("url is null"));
-            }
         }
+
+        final Request request = new NetworkRequest(url, requestType);
+        add(request, listener);
     }
 
     private void add(final Request request, final ServiceApi.Listener listener) {
         Future<Response> task = mService.submit(new RequestExecutor(request, this));
-        mCurrentTasksMap.put(request.getUrl(), task);
-        mListenersMap.put(request.getUrl(), listener);
+        mCurrentTasksMap.put(request.getUrl().toString(), task);
+        mListenersMap.put(request.getUrl().toString(), listener);
     }
 
     @Override
-    public void cancel(final URL requestUrl) {
+    public void cancel(final String requestUrl) {
         Future<Response> response = mCurrentTasksMap.remove(requestUrl);
         mListenersMap.remove(requestUrl);
         if (!response.isCancelled()) {
@@ -143,29 +144,29 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
                     final String contents = new String(response.getContents(), "UTF-8");
                     final FlickrSearchResult searchResult = (FlickrSearchResult) mParser.parse(contents, requestUrl);
                     configureImageResult(searchResult);
-                    final ServiceApi.Listener<SearchResult> listener = mListenersMap.get(requestUrl);
+                    final ServiceApi.Listener<SearchResult> listener = mListenersMap.get(requestUrl.toString());
                     if (listener != null) {
                         mMainHandler.post(() -> listener.onCompleted(searchResult));
                     }
                 } catch (final IOException | IllegalStateException e) {
                     onError(requestUrl, e);
                 } finally {
-                    removeRequest(requestUrl);
+                    removeRequest(requestUrl.toString());
                 }
                 break;
             case IMAGE:
-                final FlickrImageResult imageResult = mPendingImageRequests.get(requestUrl);
+                final FlickrImageResult imageResult = mPendingImageRequests.get(requestUrl.toString());
                 imageResult.setBitmap(response.getContents());
-                final ServiceApi.Listener<ImageResult> listener = mListenersMap.get(requestUrl);
+                final ServiceApi.Listener<ImageResult> listener = mListenersMap.get(requestUrl.toString());
                 if (listener != null) {
                     mMainHandler.post(() -> listener.onCompleted(imageResult));
                 }
-                removeRequest(requestUrl);
+                removeRequest(requestUrl.toString());
                 break;
         }
     }
 
-    private Listener removeRequest(final URL requestUrl) {
+    private Listener removeRequest(final String requestUrl) {
         mPendingImageRequests.remove(requestUrl);
         mCurrentTasksMap.remove(requestUrl);
         return mListenersMap.remove(requestUrl);
@@ -176,7 +177,7 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
         for (final FlickrImageResult img : result.getImagesUrl()) {
             final String url = String.format(Locale.US, "https://farm%d.staticflickr.com/%s/%s_%s_%s.jpg",
                     img.getFarm(), img.getServer(), img.getId(), img.getSecret(), SQUARE);
-            img.setUrl(new URL(url));
+            img.setUrl(url);
             img.setIndex(FlickrSearchResult.getIndex(result.getPage(), i));
             i++;
         }
@@ -184,7 +185,7 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
 
     @Override
     public void onError(final URL requestUrl, final Exception e) {
-        final Listener listener = removeRequest(requestUrl);
+        final Listener listener = removeRequest(requestUrl.toString());
         if (listener != null) {
             mMainHandler.post(() -> onError(requestUrl, e));
         }

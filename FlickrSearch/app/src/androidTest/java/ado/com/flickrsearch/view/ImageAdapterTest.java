@@ -8,10 +8,7 @@ import android.widget.ImageView;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -21,7 +18,6 @@ import ado.com.flickrsearch.api.ImageResult;
 import ado.com.flickrsearch.domain.FlickrImageResult;
 import ado.com.flickrsearch.network.Utils;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

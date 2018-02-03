@@ -1,19 +1,18 @@
 package ado.com.flickrsearch.domain;
 
-import java.net.URL;
 import java.util.List;
 
 import ado.com.flickrsearch.api.SearchResult;
 
 public class FlickrSearchResult implements SearchResult {
-    private URL mUrl;
+    private String mUrl;
     private int mPage;
     private String mTotalSize;
     private List<FlickrImageResult> mImages;
     private static final int PAGE_SIZE = 100;
     private static final int FIRST_PAGE_INDEX = 1;
 
-    public FlickrSearchResult(URL url) {
+    public FlickrSearchResult(String url) {
         mUrl = url;
     }
 
@@ -30,7 +29,7 @@ public class FlickrSearchResult implements SearchResult {
     }
 
     @Override
-    public URL getUrl() {
+    public String getUrl() {
         return mUrl;
     }
 

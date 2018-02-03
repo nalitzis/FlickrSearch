@@ -3,12 +3,10 @@ package ado.com.flickrsearch.domain;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import java.net.URL;
-
 import ado.com.flickrsearch.api.ImageResult;
 
 public class FlickrImageResult implements ImageResult {
-    private URL mUrl;
+    private String mUrl;
     private Bitmap mBitmap;
     private int mIndex;
     private final String mId;
@@ -42,7 +40,7 @@ public class FlickrImageResult implements ImageResult {
 
 
     @Override
-    public URL getUrl() {
+    public String getUrl() {
         return mUrl;
     }
 
@@ -60,7 +58,7 @@ public class FlickrImageResult implements ImageResult {
         mIndex = index;
     }
 
-    public void setUrl(URL url) {
+    public void setUrl(String url) {
         mUrl = url;
     }
 

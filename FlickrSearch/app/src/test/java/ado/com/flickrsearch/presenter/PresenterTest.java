@@ -5,14 +5,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.List;
-
 import ado.com.flickrsearch.FlickrSearchApp;
-import ado.com.flickrsearch.api.ImageResult;
 import ado.com.flickrsearch.api.SearchResult;
 import ado.com.flickrsearch.api.ServiceApi;
 import ado.com.flickrsearch.domain.FlickrImageResult;
-import ado.com.flickrsearch.presenter.FlickrSearchPresenter;
 import ado.com.flickrsearch.view.ImageViewer;
 
 import static org.mockito.Mockito.times;

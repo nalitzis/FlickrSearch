@@ -38,7 +38,7 @@ public class FlickrParser implements Parser {
     public SearchResult parse(String input, URL url) throws IOException, IllegalStateException {
         final StringReader stringReader = new StringReader(input);
         JsonReader reader = new JsonReader(stringReader);
-        FlickrSearchResult searchResult = new FlickrSearchResult(url);
+        FlickrSearchResult searchResult = new FlickrSearchResult(url.toString());
         try {
             searchResult = getFlickrSearchResult(reader, searchResult);
         } finally {

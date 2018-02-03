@@ -2,7 +2,6 @@ package ado.com.flickrsearch.network;
 
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Callable;
