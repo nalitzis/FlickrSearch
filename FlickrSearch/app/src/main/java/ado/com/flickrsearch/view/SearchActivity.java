@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
+import java.util.List;
+
 import ado.com.flickrsearch.R;
 import ado.com.flickrsearch.FlickrSearchApp;
 import ado.com.flickrsearch.api.ImageResult;
@@ -66,6 +68,16 @@ public class SearchActivity extends AppCompatActivity implements ImageViewer {
     }
 
     @Override
+    public void setTotalSize(int size) {
+        mImageAdapter.setSize(size);
+    }
+
+    @Override
+    public void configureImages(List<? extends ImageResult> images) {
+        mImageAdapter.configureImages(images);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
@@ -96,7 +108,11 @@ public class SearchActivity extends AppCompatActivity implements ImageViewer {
     }
 
     @Override
-    public void onNewImage(ImageResult result) {
+    public void setImage(ImageResult result) {
         mImageAdapter.add(result);
+    }
+
+    void requestNewImage(final ImageResult image, final int index) {
+        mSearchPresenter.onNewImageRequest(image, index);
     }
 }

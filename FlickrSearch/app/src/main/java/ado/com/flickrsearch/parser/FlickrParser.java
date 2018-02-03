@@ -1,7 +1,6 @@
 package ado.com.flickrsearch.parser;
 
 import android.util.JsonReader;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -9,8 +8,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import ado.com.flickrsearch.domain.FlickrImageResult;
 import ado.com.flickrsearch.domain.FlickrSearchResult;
-import ado.com.flickrsearch.domain.FlickrImageUrl;
 import ado.com.flickrsearch.api.SearchResult;
 
 public class FlickrParser implements Parser {
@@ -63,37 +62,39 @@ public class FlickrParser implements Parser {
     }
 
     private FlickrSearchResult readPhotosObject(JsonReader reader, FlickrSearchResult searchResult) throws IOException {
-        List<FlickrImageUrl> flickrImageUrls = new ArrayList<>(0);
+        List<FlickrImageResult> flickrImageResults = new ArrayList<>(0);
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
             if(name.equals(PAGE)) {
-                long l = reader.nextLong();
-            } else if(name.equals(PAGES) || name.equals(TOTAL)) {
+                searchResult.setPage(reader.nextInt());
+            } else if(name.equals(PAGES)) {
                 reader.nextString();
+            } else if(name.equals(TOTAL)) {
+                searchResult.setTotalSize(reader.nextString());
             } else if(name.equals(PERPAGE)) {
-                reader.nextLong();
+                reader.nextInt();
             } else if(name.equals(PHOTO)) {
-                flickrImageUrls = readPhotoArray(reader);
+                flickrImageResults = readPhotoArray(reader);
             }
         }
         reader.endObject();
-        searchResult.setImages(flickrImageUrls);
+        searchResult.setImages(flickrImageResults);
         return searchResult;
     }
 
 
-    private List<FlickrImageUrl> readPhotoArray(final JsonReader reader) throws IOException {
-        List<FlickrImageUrl> flickrImageUrls = new ArrayList<>();
+    private List<FlickrImageResult> readPhotoArray(final JsonReader reader) throws IOException {
+        List<FlickrImageResult> flickrImages = new ArrayList<>();
         reader.beginArray();
         while (reader.hasNext()) {
-            flickrImageUrls.add(readPhotoElement(reader));
+            flickrImages.add(readPhotoElement(reader));
         }
         reader.endArray();
-        return flickrImageUrls;
+        return flickrImages;
     }
 
-    private FlickrImageUrl readPhotoElement(final JsonReader reader) throws IOException {
+    private FlickrImageResult readPhotoElement(final JsonReader reader) throws IOException {
         String server = "";
         String secret = "";
         String id = "";
@@ -116,6 +117,6 @@ public class FlickrParser implements Parser {
             }
         }
         reader.endObject();
-        return new FlickrImageUrl(id, secret, server, farm);
+        return new FlickrImageResult(id, secret, server, farm);
     }
 }

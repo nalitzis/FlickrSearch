@@ -20,7 +20,6 @@ import ado.com.flickrsearch.api.ServiceApi;
 import ado.com.flickrsearch.domain.FlickrImageResult;
 import ado.com.flickrsearch.api.ImageResult;
 import ado.com.flickrsearch.api.SearchResult;
-import ado.com.flickrsearch.domain.FlickrImageUrl;
 import ado.com.flickrsearch.domain.FlickrSearchResult;
 import ado.com.flickrsearch.parser.FlickrParser;
 
@@ -39,6 +38,7 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
     //search api
     private static final String SEARCH_API = "flickr.photos.search";
     private static final String TEXT = "text=";
+    private static final String PAGE = "page=";
     private static final String FORMAT = "format=json&nojsoncallback=1";
 
     //image api
@@ -50,6 +50,7 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
 
     private final Map<URL, Future<Response>> mCurrentTasksMap;
     private final Map<URL, ServiceApi.Listener> mListenersMap;
+    private final Map<URL, FlickrImageResult> mPendingImageRequests;
 
     private final FlickrParser mParser;
 
@@ -62,20 +63,23 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
         mService = Executors.newFixedThreadPool(NUM_OF_THREADS);
         mCurrentTasksMap = Collections.synchronizedMap(new HashMap<URL, Future<Response>>());
         mListenersMap = Collections.synchronizedMap(new HashMap<URL, ServiceApi.Listener>());
+        mPendingImageRequests = Collections.synchronizedMap(new HashMap<URL, FlickrImageResult>());
     }
 
     @Override
-    public void search(final String query, final Listener listener) {
-        final URL url = buildSearchTextQuery(API_KEY_VALUE, SEARCH_API, query);
+    public void search(final String query, final String pageNumber, final Listener listener) {
+        final URL url = buildSearchTextQuery(API_KEY_VALUE, SEARCH_API, query, pageNumber);
         doFetch(url, listener, Request.ExpectedResultType.TEXT);
     }
 
+    //URL: https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=a87d1a33ac9b5c4a06591b64f15eead2&text=kittens&page=1&format=json&nojsoncallback=1&api_sig=95e07a28fa601b0071a2c550c90f900f
     @Nullable
-    private URL buildSearchTextQuery(String apiKeyValue, String method, String searchText) {
+    private URL buildSearchTextQuery(final String apiKeyValue, final String method, final String searchText, final String pageNumber) {
         StringBuilder sb = new StringBuilder();
         sb.append(FLICKR_API_ENDPOINT).append(METHOD).append(method)
                 .append(AMP).append(API_KEY).append(apiKeyValue)
                 .append(AMP).append(TEXT).append(searchText)
+                .append(AMP).append(PAGE).append(pageNumber)
                 .append(AMP).append(FORMAT);
         try {
             return new URL(sb.toString());
@@ -86,13 +90,17 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
     }
 
     @Override
-    public void fetchImage(URL imageUrl, Listener listener) {
-        doFetch(imageUrl, listener, Request.ExpectedResultType.IMAGE);
+    public void fetchImage(final ImageResult imageResult, final Listener listener) {
+        mPendingImageRequests.put(imageResult.getUrl(), (FlickrImageResult)imageResult);
+        doFetch(imageResult.getUrl(), listener, Request.ExpectedResultType.IMAGE);
     }
 
-    private void doFetch(final URL url, final Listener listener, Request.ExpectedResultType requestType) {
+    private void doFetch(final URL url, final Listener listener, final Request.ExpectedResultType requestType) {
+        if (mListenersMap.containsKey(url))
+            return;
+
         if (url != null) {
-            Request request = new NetworkRequest(url, requestType);
+            final Request request = new NetworkRequest(url, requestType);
             add(request, listener);
         } else {
             if (listener != null) {
@@ -101,14 +109,14 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
         }
     }
 
-    private void add(Request request, ServiceApi.Listener listener) {
+    private void add(final Request request, final ServiceApi.Listener listener) {
         Future<Response> task = mService.submit(new RequestExecutor(request, this));
         mCurrentTasksMap.put(request.getUrl(), task);
         mListenersMap.put(request.getUrl(), listener);
     }
 
     @Override
-    public void cancel(URL requestUrl) {
+    public void cancel(final URL requestUrl) {
         Future<Response> response = mCurrentTasksMap.remove(requestUrl);
         mListenersMap.remove(requestUrl);
         if (!response.isCancelled()) {
@@ -121,47 +129,52 @@ public class FlickrRequestManager implements ServiceApi, RequestListener {
     public void onCompleted(final URL requestUrl, final Response response) {
         Log.d(TAG, "onCompleted() " + requestUrl.toString());
         switch (response.getType()) {
-            //TODO extract methods
             case TEXT:
                 try {
                     final String contents = new String(response.getContents(), "UTF-8");
                     final FlickrSearchResult searchResult = (FlickrSearchResult) mParser.parse(contents, requestUrl);
-                    generateImageUrls(searchResult);
+                    configureImageResult(searchResult);
                     final ServiceApi.Listener<SearchResult> listener = mListenersMap.get(requestUrl);
                     if (listener != null) {
                         mMainHandler.post(() -> listener.onCompleted(searchResult));
                     }
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     onError(requestUrl, e);
                 } finally {
                     removeRequest(requestUrl);
                 }
                 break;
             case IMAGE:
-                final ImageResult imageResult = new FlickrImageResult(response);
-                final ServiceApi.Listener<ImageResult> listener = mListenersMap.remove(requestUrl);
+                final FlickrImageResult imageResult = mPendingImageRequests.get(requestUrl);
+                imageResult.setBitmap(response.getContents());
+                final ServiceApi.Listener<ImageResult> listener = mListenersMap.get(requestUrl);
                 if (listener != null) {
                     mMainHandler.post(() -> listener.onCompleted(imageResult));
                 }
+                removeRequest(requestUrl);
                 break;
         }
     }
 
-    private Listener removeRequest(URL requestUrl) {
+    private Listener removeRequest(final URL requestUrl) {
+        mPendingImageRequests.remove(requestUrl);
         mCurrentTasksMap.remove(requestUrl);
         return mListenersMap.remove(requestUrl);
     }
 
-    private void generateImageUrls(final FlickrSearchResult result) throws MalformedURLException {
-        for (FlickrImageUrl img : result.getImagesUrl()) {
+    private void configureImageResult(final FlickrSearchResult result) throws MalformedURLException {
+        int i = 0;
+        for (final FlickrImageResult img : result.getImagesUrl()) {
             final String url = String.format(Locale.US, "https://farm%d.staticflickr.com/%s/%s_%s_%s.jpg",
-                    img.getFarm(), img.getmServer(), img.getId(), img.getSecret(), SQUARE);
-            img.setImageUrl(new URL(url));
+                    img.getFarm(), img.getServer(), img.getId(), img.getSecret(), SQUARE);
+            img.setUrl(new URL(url));
+            img.setIndex(FlickrSearchResult.getIndex(result.getPage(), i));
+            i++;
         }
     }
 
     @Override
-    public void onError(URL requestUrl, Exception e) {
+    public void onError(final URL requestUrl, final Exception e) {
         final Listener listener = removeRequest(requestUrl);
         if (listener != null) {
             mMainHandler.post(() -> onError(requestUrl, e));

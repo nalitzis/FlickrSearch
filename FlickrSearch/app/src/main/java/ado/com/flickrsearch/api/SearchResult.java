@@ -4,5 +4,9 @@ import java.util.List;
 
 public interface SearchResult extends Result {
 
-    List<? extends ImageUrl> getImagesUrl();
+    List<? extends ImageResult> getImagesUrl();
+
+    String getTotalSize();
+
+    int getPage();
 }

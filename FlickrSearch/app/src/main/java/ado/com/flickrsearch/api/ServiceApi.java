@@ -6,9 +6,9 @@ import java.net.URL;
 
 public interface ServiceApi {
 
-    void search(String query, Listener listener);
+    void search(String query, String page, Listener listener);
 
-    void fetchImage(URL imageUrl, Listener listener);
+    void fetchImage(ImageResult image, Listener listener);
 
     void cancel(URL requestUrl);
 

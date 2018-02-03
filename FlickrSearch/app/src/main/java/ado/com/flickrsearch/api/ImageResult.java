@@ -5,4 +5,6 @@ import android.graphics.Bitmap;
 public interface ImageResult extends Result {
 
     Bitmap getBitmap();
+
+    int getIndex();
 }
